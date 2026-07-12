@@ -171,14 +171,9 @@ npm run dev
 
 # 🔑 Environment Variables
 
-Create a `.env` file containing the required API keys and configuration.
-
-Example:
-
 ```
-SUPABASE_URL=YOUR_URL
-SUPABASE_ANON_KEY=YOUR_KEY
-FIREWORKS_API_KEY=YOUR_KEY
+SUPABASE_URL=https://supabase.com/dashboard/project/geueqrnnvmuugffviarq
+FIREWORKS_API_KEY=fw_CtqT4DkrZd3HAYYEw1ZnE6
 ```
 
 ---
@@ -228,11 +223,11 @@ src/components/coach/CameraView.tsx
 
 ## Ankur Payeng
 
-- AMD Developer Cloud Integration
+- Documentation (README)
+- Presentation Preparation
 - Project Submission
-- Documentation
-- Presentation
-- Team Communication
+- Team Coordination
+- Testing & Quality Assurance
 
 ---
 
