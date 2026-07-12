@@ -23,6 +23,8 @@ import Button from "../ui/Button";
 import { cn } from "../../utils/cn";
 import type { ChatAction } from "../../types/coach";
 import { coachService } from "../../services/coachService";
+import { supabase } from "../../services/supabase/client";
+import profileService from "../../services/profileService";
 import ReactMarkdown from "react-markdown";
 
 /**
@@ -198,24 +200,30 @@ Tell me what workout you'd like to do today, or choose one of the options below.
     try {
       // const reply = await coachService.askCoach(trimmed);
 
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      let profile = null;
+
+      if (user) {
+        profile = await profileService.get(user.id);
+      }
+
       const reply = await coachService.askCoach(trimmed, {
-        userProfile: {
-          goal: "Muscle Gain",
-          age: 21,
-        },
-
-        progress: {
-          weight: 67,
-          bodyFat: 18,
-          streak: 3,
-        },
-
-        nutritionHistory: [
-          {
-            protein: 60,
-            calories: 1700,
-          },
-        ],
+        userProfile: profile
+          ? {
+              age: profile.age,
+              gender: profile.gender,
+              goal: profile.goal,
+              height: profile.height_cm,
+              weight: profile.weight_kg,
+              activityLevel: profile.activity_level,
+              workoutLocation: profile.workout_location,
+              experience: profile.experience_level,
+              diet: profile.diet_type,
+            }
+          : undefined,
       });
 
       const workoutReplies: Record<string, string> = {

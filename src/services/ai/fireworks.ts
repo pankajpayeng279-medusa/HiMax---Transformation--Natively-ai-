@@ -16,7 +16,7 @@
  */
 
 export interface FireworksChatMessage {
-  role: 'system' | 'user' | 'assistant';
+  role: "system" | "user" | "assistant";
   content: string;
 }
 
@@ -35,11 +35,12 @@ export interface CoachContext {
   recentConversations?: FireworksChatMessage[];
 }
 
-const FIREWORKS_API_URL = 'https://api.fireworks.ai/inference/v1/chat/completions';
+const FIREWORKS_API_URL =
+  "https://api.fireworks.ai/inference/v1/chat/completions";
 
 // Swap to whichever Fireworks model you've provisioned (or the Gemma
 // endpoint later) — nothing else needs to change.
-const FIREWORKS_MODEL = 'accounts/fireworks/models/glm-5p2';
+const FIREWORKS_MODEL = "accounts/fireworks/models/glm-5p2";
 
 const BASE_SYSTEM_PROMPT = `You are HiMax AI Coach, an elite AI fitness coach integrated into the HiMax Personal Transformation platform.
 
@@ -160,27 +161,36 @@ function buildSystemPrompt(context?: CoachContext): string {
     sections.push(`User profile:\n${JSON.stringify(context.userProfile)}`);
   }
   if (context.workoutHistory?.length) {
-    sections.push(`Recent workout history:\n${JSON.stringify(context.workoutHistory)}`);
+    sections.push(
+      `Recent workout history:\n${JSON.stringify(context.workoutHistory)}`,
+    );
   }
   if (context.progress) {
     sections.push(`Progress data:\n${JSON.stringify(context.progress)}`);
   }
   if (context.nutritionHistory?.length) {
-    sections.push(`Recent nutrition history:\n${JSON.stringify(context.nutritionHistory)}`);
+    sections.push(
+      `Recent nutrition history:\n${JSON.stringify(context.nutritionHistory)}`,
+    );
   }
 
-  return sections.join('\n\n');
+  return sections.join("\n\n");
 }
 
-function buildMessages(userMessage: string, context?: CoachContext): FireworksChatMessage[] {
-  const messages: FireworksChatMessage[] = [{ role: 'system', content: buildSystemPrompt(context) }];
+function buildMessages(
+  userMessage: string,
+  context?: CoachContext,
+): FireworksChatMessage[] {
+  const messages: FireworksChatMessage[] = [
+    { role: "system", content: buildSystemPrompt(context) },
+  ];
 
   // Prior turns, once conversation memory is wired up.
   if (context?.recentConversations?.length) {
     messages.push(...context.recentConversations);
   }
 
-  messages.push({ role: 'user', content: userMessage });
+  messages.push({ role: "user", content: userMessage });
   return messages;
 }
 
@@ -194,19 +204,22 @@ function buildMessages(userMessage: string, context?: CoachContext): FireworksCh
  * param exists so coachService.askCoach() can pass real user/workout/
  * nutrition data through later without this signature changing.
  */
-export async function chatWithFireworks(message: string, context?: CoachContext): Promise<string> {
+export async function chatWithFireworks(
+  message: string,
+  context?: CoachContext,
+): Promise<string> {
   const apiKey = import.meta.env.VITE_FIREWORKS_API_KEY as string | undefined;
 
   if (!apiKey) {
     throw new Error(
-      'Missing VITE_FIREWORKS_API_KEY. Set it in your .env file (never hardcode API keys).',
+      "Missing VITE_FIREWORKS_API_KEY. Set it in your .env file (never hardcode API keys).",
     );
   }
 
   const response = await fetch(FIREWORKS_API_URL, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
@@ -218,16 +231,54 @@ export async function chatWithFireworks(message: string, context?: CoachContext)
   });
 
   if (!response.ok) {
-    const errorBody = await response.text().catch(() => '');
-    throw new Error(`Fireworks API error ${response.status}: ${errorBody || response.statusText}`);
+    const errorBody = await response.text().catch(() => "");
+    throw new Error(
+      `Fireworks API error ${response.status}: ${errorBody || response.statusText}`,
+    );
   }
 
   const data = await response.json();
   const content = data?.choices?.[0]?.message?.content;
+  let cleaned = content?.trim() ?? "";
 
-  if (typeof content !== 'string' || !content.trim()) {
-    throw new Error('Fireworks API returned an empty response.');
+  const markers = [
+    "Analyze the Request:",
+    "Reasoning:",
+    "Thoughts:",
+    "Planning:",
+    "Internal Notes:",
+    "Constraint Checklist",
+  ];
+
+  for (const marker of markers) {
+    const index = cleaned.indexOf(marker);
+    if (index !== -1) {
+      // Keep only the part after the reasoning block by looking for the first real markdown heading
+      const heading = cleaned.indexOf("#");
+      if (heading !== -1 && heading > index) {
+        cleaned = cleaned.slice(heading).trim();
+      }
+      break;
+    }
   }
 
-  return content.trim();
+  if (!cleaned) {
+    throw new Error("Fireworks API returned an empty response.");
+  }
+
+  return cleaned;
+
+  if (typeof content !== "string" || !content.trim()) {
+    throw new Error("Fireworks API returned an empty response.");
+  }
+
+  let finalAnswer = content.trim();
+
+  const reasoningEnd = finalAnswer.lastIndexOf("###");
+
+  if (reasoningEnd !== -1) {
+    finalAnswer = finalAnswer.substring(reasoningEnd);
+  }
+
+  return finalAnswer;
 }
