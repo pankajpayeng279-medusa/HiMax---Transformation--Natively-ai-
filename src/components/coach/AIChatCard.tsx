@@ -344,7 +344,7 @@ Tell me what workout you'd like to do today, or choose one of the options below.
     <Card
       padding="none"
       className={cn(
-        "relative overflow-hidden backdrop-blur-xl bg-surface/90",
+        "flex flex-col overflow-hidden backdrop-blur-xl bg-surface/90",
         className,
       )}
     >
@@ -398,10 +398,15 @@ Tell me what workout you'd like to do today, or choose one of the options below.
 
       {/* Messages */}
       <div
-        className={cn(
-          "overflow-y-auto px-5 py-4 space-y-4 transition-all duration-500",
-          workoutChosen ? "h-[420px] lg:h-[600px]" : "h-[170px]",
-        )}
+        className="
+flex-1
+overflow-y-auto
+px-5
+py-4
+space-y-4
+min-h-[450px]
+max-h-[65vh]
+"
       >
         {messages.map((message) => (
           <ChatBubble

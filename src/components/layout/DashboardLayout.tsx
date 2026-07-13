@@ -64,7 +64,16 @@ export default function DashboardLayout() {
   return (
     <div className="min-h-screen bg-black text-white flex">
       <Sidebar />
-      <main className="flex-1 ml-64 p-6 lg:p-8 overflow-x-hidden">
+      <main
+        className="
+flex-1
+lg:ml-64
+p-4
+sm:p-6
+lg:p-8
+overflow-x-hidden
+"
+      >
         <Outlet />
       </main>
     </div>
