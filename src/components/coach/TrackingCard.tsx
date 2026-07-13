@@ -42,6 +42,7 @@ export default function TrackingCard({
   onSetComplete,
   onComplete,
 }: TrackingCardProps) {
+  const [fullscreen, setFullscreen] = useState(false);
   const [isTrackingPaused, setIsTrackingPaused] = useState(false);
   const [status, setStatus] = useState<TrackingStatus>("idle");
   const [reps, setReps] = useState(0);
@@ -107,6 +108,7 @@ export default function TrackingCard({
     await trackingService.startTracking(exercise);
 
     setStatus("tracking");
+    setFullscreen(true);
 
     startTimer();
   };
@@ -214,12 +216,13 @@ export default function TrackingCard({
     );
 
     setStatus("stopped");
+    setFullscreen(false);
 
     onComplete(result.exerciseId, result.repsCounted, result.elapsedSeconds);
   };
 
   return (
-    <section className="rounded-2xl border border-border bg-surface p-6 lg:p-8">
+   <section className="rounded-2xl border border-border bg-surface p-6 lg:p-8">
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-lg font-heading font-bold text-text">
           Camera Tracking
@@ -230,7 +233,25 @@ export default function TrackingCard({
         </span>
       </div>
 
-      <div className="relative aspect-video w-full rounded-xl border-2 border-emerald-500/60 bg-bg overflow-hidden flex items-center justify-center mb-5">
+      <div
+        className="
+relative
+w-full
+h-[72vh]
+sm:h-[520px]
+lg:aspect-video
+lg:h-auto
+rounded-xl
+border-2
+border-emerald-500/60
+bg-bg
+overflow-hidden
+flex
+items-center
+justify-center
+mb-5
+"
+      >
         <div className="absolute inset-4 rounded-lg border border-dashed border-emerald-500/30" />
 
         <CelebrationOverlay
@@ -274,7 +295,7 @@ export default function TrackingCard({
         </span>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div className="rounded-xl bg-bg border border-border px-4 py-3">
           <p className="text-xs text-text-muted mb-1">Exercise</p>
           <p className="text-sm font-semibold text-text truncate">
@@ -302,7 +323,7 @@ export default function TrackingCard({
         </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         {waitingNextSet ? (
           <button
             onClick={handleStart}

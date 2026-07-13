@@ -222,19 +222,39 @@ export default function CameraView({
 
       {/* AI Overlay */}
 
-      <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-md rounded-xl px-4 py-3 text-white min-w-[220px]">
+      <div
+        className="
+absolute
+top-2
+left-2
+sm:top-4
+sm:left-4
+bg-black/70
+backdrop-blur-md
+rounded-xl
+px-3
+sm:px-4
+py-2
+sm:py-3
+text-white
+w-[170px]
+sm:min-w-[220px]
+"
+      >
         <p className="text-xs uppercase tracking-widest text-gray-300">
           AI Coach
         </p>
 
-        <p className="text-2xl font-bold mt-1">
+        <p className="text-lg sm:text-2xl font-bold mt-1">
           {currentRep} / {targetReps} Reps
         </p>
 
-        <p className="text-sm text-gray-300 mt-1">Elbow: {angle.toFixed(0)}°</p>
+        <p className="text-xs sm:text-sm text-gray-300 mt-1">
+          Elbow: {angle.toFixed(0)}°
+        </p>
 
         <div
-          className={`mt-3 rounded-lg px-3 py-2 text-sm font-medium ${
+          className={`mt-2 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium ${
             isPoseValid
               ? "bg-emerald-500/20 text-emerald-400"
               : "bg-amber-500/20 text-amber-300"
